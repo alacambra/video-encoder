@@ -1,0 +1,10 @@
+FROM openshift/base-centos7
+USER root
+RUN yum install epel-release -y
+RUN yum update -y
+RUN rpm --import http://li.nux.ro/download/nux/RPM-GPG-KEY-nux.ro
+RUN rpm -Uvh http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm
+RUN yum install ffmpeg ffmpeg-devel -y
+RUN mkdir -p /opt/jobs/
+RUN chown -R 1001 /opt/jobs
+USER 1001
