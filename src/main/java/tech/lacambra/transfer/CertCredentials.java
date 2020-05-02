@@ -21,6 +21,6 @@ public class CertCredentials {
   }
 
   public String getPrivateKeyPassphrase() {
-    return privateKeyPassphrase;
+    return "\"\"".equals(privateKeyPassphrase) ? null : privateKeyPassphrase;
   }
 }

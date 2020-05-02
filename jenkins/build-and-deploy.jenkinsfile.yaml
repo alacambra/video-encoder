@@ -1,0 +1,21 @@
+kind: BuildConfig
+apiVersion: v1
+metadata:
+  name: deploy-video-encoder
+  labels:
+    app: deploy-video-encoder
+spec:
+  resources:
+    requests:
+      cpu: 200Mi
+      memory: 500Mi
+  runPolicy: Parallel
+  source:
+    git:
+      ref: master
+      uri: "https://github.com/alacambra/video-encoder.git"
+    type: Git
+  strategy:
+    type: JenkinsPipeline
+    jenkinsPipelineStrategy:
+      jenkinsfilePath: jenkins/deploy.oc.Jenkinsfile

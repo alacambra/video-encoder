@@ -1,0 +1,20 @@
+# Steps for OC
+## Create key for sftp transfer
+
+. ssh-keygen
+__
+## Create Config Map for application.properties
+
+oc set volume dc/video-encoder-app --add --secret-name  encoder.private.key --mount-path=/opt/app/pki/video-encoder
+oc set volume dc/video-encoder-app --add --configmap-name application.properties  --mount-path=/opt/app-root/src/config
+
+
+## Import imgage stream
+Run build-and-push-image.sh
+oc import-image  video-encoder --from=alacambra/video-encoder:latest --confirm
+
+## Create application
+oc new-app --labels="app=video-encodder" video-encoder:latest~/. --name video-encoder-app
+
+## Start application
+oc start-build --from-dir . video-encoder

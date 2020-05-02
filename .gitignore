@@ -34,4 +34,10 @@ pom.xml.releaseBackup
 pom.xml.versionsBackup
 release.properties
 
-.mvn
+openshift/video-encoder
+openshift/video-encoder.pub
+src/main/resources/application.properties
+src/main/resources/application.local.properties
+/src/main/resources/application.oc.properties
+
+project.template.yaml
