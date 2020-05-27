@@ -38,6 +38,13 @@ openshift/video-encoder
 openshift/video-encoder.pub
 src/main/resources/application.properties
 src/main/resources/application.local.properties
-/src/main/resources/application.oc.properties
+src/main/resources/application.oc.properties
 
 project.template.yaml
+
+openshift/deployment/
+openshift/pki/
+openshift/s2i-image/lib/
+openshift/templates/
+src/main/docker/lib/
+src/main/docker/video-encoder-1.0-SNAPSHOT-runner.jar

@@ -48,7 +48,7 @@ public class Encoder {
         .addOutput(workingPath + targetFileName)   // Filename for the destination
         .setFormat("mp4")
         .setVideoQuality(10)
-        .setVideoCodec("libx265")     // Video using x264
+        .setVideoCodec("libx264")     // Video using x264
         .setVideoFrameRate(24, 1)
         .setStrict(FFmpegBuilder.Strict.EXPERIMENTAL) // Allow FFmpeg to use experimental specs
         .done();
