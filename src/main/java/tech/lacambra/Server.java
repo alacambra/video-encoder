@@ -2,21 +2,26 @@ package tech.lacambra;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.context.ManagedExecutor;
+import tech.lacambra.transfer.FileEntry;
 import tech.lacambra.transfer.SftpClient;
 import tech.lacambra.video.Encoder;
 import tech.lacambra.video.EncodingRequest;
 
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
+import javax.json.JsonArray;
+import javax.json.stream.JsonCollectors;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.logging.Logger;
 
 @Path("/encode")
+@Produces(MediaType.APPLICATION_JSON)
 public class Server {
 
   private static final Logger LOGGER = Logger.getLogger(Server.class.getName());
@@ -71,21 +76,26 @@ public class Server {
   }
 
   @POST
-  @Path("up")
+  @Path("/up")
   @Consumes(MediaType.APPLICATION_OCTET_STREAM)
   public void uploadFiles(InputStream stream) {
-    try (SftpClient sftpClient = sftpClientInstances.get()) {
-      sftpClient.connect();
+    try (SftpClient sftpClient = sftpClientInstances.get().connect()) {
       if (!sftpClient.pathExists("/downloader-albert/test")) {
         sftpClient.createDir("/downloader-albert/test");
       }
-
-//      sftpClient.uploadFile("/downloader-albert/test/t.txt", stream);
     }
   }
 
   @GET
-  @Path("encode")
+  @Path("/source")
+  public JsonArray listSources() {
+    try (SftpClient sftpClient = sftpClientInstances.get().connect()) {
+      return sftpClient.listDir(waitingPath).stream().map(FileEntry::getNameAsJson).collect(JsonCollectors.toJsonArray());
+    }
+  }
+
+  @GET
+  @Path("/encode")
   public void encode(@QueryParam("fileName") String fileName) {
 
 
@@ -115,6 +125,12 @@ public class Server {
       LOGGER.info(String.format("[startEncoding] Uploading file. remotePath=%s, sourcePath=%s, fileName=%s", encodedPath, Paths.get(processingPath + fileName), targetFileName));
       sftpClient.uploadFile(encodedPath, Paths.get(processingPath + targetFileName), targetFileName);
       LOGGER.info("[startEncoding] File uploaded");
+    }
+  }
+
+  private <T> T executeWithFtp(Function<SftpClient, T> action) {
+    try (SftpClient sftpClient = sftpClientInstances.get().connect()) {
+      return action.apply(sftpClient);
     }
   }
 }

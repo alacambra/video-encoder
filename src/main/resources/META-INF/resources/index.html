@@ -8,13 +8,23 @@
 
 <div class="container">
   <div class="left-column">
+
+    <file-list></file-list>
+
     <label for="sourceName">File source name</label>
     <input type="text" id="sourceName" value="">
 
     <label for="targetName">File source name</label>
     <input type="text" id="targetName" value="">
+
     <button onclick="startEncoding()">TEST!!</button>
+
+
     <button onClick="uploadFileHandler(event)">select a video</button>
+
+    <script type="module" src="EncoderClient.js"></script>
+    <script type="module" src="components/FilesDialog.js"></script>
+
     <script type="text/javascript">
 
         function uploadFileStream(bytes, fileName) {

@@ -11,7 +11,10 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.Vector;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @Dependent
 public class SftpClient implements AutoCloseable {
@@ -41,26 +44,26 @@ public class SftpClient implements AutoCloseable {
 
   private static final Logger LOGGER = Logger.getLogger(SftpClient.class.getName());
 
-//  public Collection<String> listDir(String path) {
-//
-//    ChannelSftp channelSftp = null;
-//    channelSftp = createChannelSftp();
-//
-//    try {
-//
-//      Vector<ChannelSftp.LsEntry> v = channelSftp.ls("/downloader-albert");
-//      System.out.println(pathExists("/downloader-albert"));
-//      isFile(path);
-//
-//      return v.stream().map(ChannelSftp.LsEntry::getFilename).collect(Collectors.toList());
-//    } catch (SftpException e) {
-//      throw new RuntimeException(e);
-//    } finally {
-//      if (channelSftp != null && !channelSftp.isClosed()) {
-//        channelSftp.disconnect();
-//      }
-//    }
-//  }
+  public Collection<FileEntry> listDir(String path) {
+
+    try {
+
+      if (!pathExists(path)) {
+        throw PathDoesNotExistsException.folderDoesNotExists(path);
+      }
+
+      if (!isDir(path)) {
+        throw PathDoesNotExistsException.fileDoesNotExists(path);
+      }
+
+      Vector<ChannelSftp.LsEntry> v = channelSftp.ls(path);
+
+      return v.stream().map(l -> new FileEntry(l.getFilename(), l.getLongname())).collect(Collectors.toList());
+
+    } catch (SftpException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
   public boolean pathExists(String path) {
     try {
@@ -83,7 +86,7 @@ public class SftpClient implements AutoCloseable {
 
     try {
       if (!pathExists(path)) {
-        throw new RuntimeException("Path does not exists");
+        throw PathDoesNotExistsException.pathDoesNotExists("Path does not exists");
       }
 
       return channelSftp.lstat(path).isDir();
@@ -122,11 +125,11 @@ public class SftpClient implements AutoCloseable {
   public void saveFileLocally(String remoteSource, String localTargetDir, String targetName) {
 
     if (!Files.exists(Paths.get(localTargetDir))) {
-      throw new RuntimeException("Invalid target given");
+      throw PathDoesNotExistsException.folderDoesNotExists(localTargetDir);
     }
 
     if (!pathExists(remoteSource) || !isFile(remoteSource)) {
-      throw new RuntimeException("Invalid source give");
+      throw PathDoesNotExistsException.folderDoesNotExists(remoteSource);
     }
 
     Path target = Paths.get(localTargetDir).resolve(targetName);
@@ -159,10 +162,10 @@ public class SftpClient implements AutoCloseable {
 
   }
 
-  public void connect() {
+  public SftpClient connect() {
 
     if (channelSftp != null && channelSftp.isConnected()) {
-      return;
+      return this;
     }
 
     getSession();
@@ -179,6 +182,8 @@ public class SftpClient implements AutoCloseable {
       session.disconnect();
       throw new RuntimeException(e);
     }
+
+    return this;
   }
 
   public Session getSession() {
