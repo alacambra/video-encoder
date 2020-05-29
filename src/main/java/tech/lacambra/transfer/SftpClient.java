@@ -58,7 +58,10 @@ public class SftpClient implements AutoCloseable {
 
       Vector<ChannelSftp.LsEntry> v = channelSftp.ls(path);
 
-      return v.stream().map(l -> new FileEntry(l.getFilename(), l.getLongname())).collect(Collectors.toList());
+      return v.stream()
+          .filter(l -> !(l.getFilename().equals("..") || l.getFilename().equals(".")))
+          .map(l -> new FileEntry(l.getFilename(), l.getLongname()))
+          .collect(Collectors.toList());
 
     } catch (SftpException e) {
       throw new RuntimeException(e);

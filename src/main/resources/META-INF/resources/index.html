@@ -6,21 +6,12 @@
 </head>
 <body>
 
-<div class="container">
+<div class="container" style="float: left;">
   <div class="left-column">
 
     <file-list></file-list>
 
-    <label for="sourceName">File source name</label>
-    <input type="text" id="sourceName" value="">
-
-    <label for="targetName">File source name</label>
-    <input type="text" id="targetName" value="">
-
-    <button onclick="startEncoding()">TEST!!</button>
-
-
-    <button onClick="uploadFileHandler(event)">select a video</button>
+<!--  <button onClick="uploadFileHandler(event)">select a video</button>  -->
 
     <script type="module" src="EncoderClient.js"></script>
     <script type="module" src="components/FilesDialog.js"></script>
@@ -64,28 +55,6 @@
             el.click();
         }
 
-        async function startEncoding() {
-
-            const source = document.getElementById("sourceName").value;
-            const target = document.getElementById("targetName").value;
-
-            await postData('encode', {
-                source: source, target: target
-            });
-        }
-
-        function postData(url = ``, data = {}) {
-            return fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data),
-            })
-                .then(response => inspectResponse(response))
-                .then(response => response.json());
-        }
-
         function postStream(url = ``, data = {}) {
             return fetch(url, {
                 method: "POST",
@@ -98,28 +67,10 @@
                 .then(response => response.json());
         }
 
-        function del(url) {
-            return fetch(url, {
-                method: "DELETE",
-            }).then(response => inspectResponse(response))
-        }
-
-        function getData(url = ``, data = {}) {
-            return fetch(url, {
-                method: "GET"
-            })
-                .then(response => inspectResponse(response))
-                .then(response => response.json());
-        }
-
         function inspectResponse(response) {
             console.info(response.status, response.headers);
             return response;
         }
-
-        window.onload = function () {
-
-        };
 
     </script>
   </div>
